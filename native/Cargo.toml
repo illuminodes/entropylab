@@ -15,6 +15,7 @@ bitcoin = { version = "=0.32.11", default-features = false, features = ["std", "
 bip39 = { version = "=2.2.2", default-features = false }
 base58ck = { version = "=0.1.101", default-features = false, features = ["std"] }
 bech32 = { version = "=0.11.1", default-features = false, features = ["alloc"] }
+miniscript = { version = "=13.1.0", default-features = false, features = ["std"] }
 
 el-entropy = { path = "crates/el-entropy" }
 xinachtli = { path = "/home/cuarentaydos/Code/tooling/xinachtli" }
