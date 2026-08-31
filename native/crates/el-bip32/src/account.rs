@@ -26,6 +26,7 @@ pub enum AccountError {
     Bip32(bitcoin::bip32::Error),
     Descriptor(DescriptorError),
     Slip132(Slip132Error),
+    UncompressedKey,
 }
 
 impl Account {
@@ -210,6 +211,7 @@ impl core::fmt::Display for AccountError {
             Self::Bip32(error) => write!(f, "the key derivation failed: {error}"),
             Self::Descriptor(error) => write!(f, "{error}"),
             Self::Slip132(error) => write!(f, "{error}"),
+            Self::UncompressedKey => f.write_str("an address needs a compressed public key"),
         }
     }
 }

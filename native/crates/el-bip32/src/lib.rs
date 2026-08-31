@@ -10,11 +10,13 @@
 //! alternate flag, `{:#}`. It omits the leading `m/`.
 
 pub mod account;
+pub mod address;
 pub mod descriptor;
 pub mod script_type;
 pub mod slip132;
 
 pub use account::{Account, AccountError};
+pub use address::AddressRow;
 pub use descriptor::{Chain, Descriptor, DescriptorError};
 pub use script_type::ScriptType;
 pub use slip132::{KeyVersion, Slip132Error, Slip132Family, Slip132Network, Slip132Scope};
