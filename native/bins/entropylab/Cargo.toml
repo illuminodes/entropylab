@@ -1,0 +1,25 @@
+[package]
+name = "entropylab-bin"
+edition.workspace = true
+version.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[[bin]]
+name = "entropylab"
+path = "src/main.rs"
+
+[lints]
+workspace = true
+
+[dependencies]
+bip39.workspace = true
+bitcoin.workspace = true
+el-bip32.workspace = true
+# The window: xdg-shell toplevel, the software canvas, and key input.
+platform.workspace = true
+# `TextRenderer`, shared with the cozy binaries so text metrics agree.
+statusbar.workspace = true
+# The font and colour tables the cozy clients read.
+config.workspace = true
+waker.workspace = true

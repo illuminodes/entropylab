@@ -1,6 +1,24 @@
 [workspace]
 resolver = "2"
-members = ["crates/*"]
+members = ["bins/*", "crates/*"]
+
+# The cozy workspace optimizes these crates even in dev builds: their hot
+# paths are hand-written SIMD loops that degrade to non-inlined, bounds
+# checked calls at opt-level 0, which is roughly 100 times slower. A path
+# dependency does not carry a profile, so the same overrides must be
+# repeated here. Without them the Wayland reader cannot keep up and the
+# connection wedges before the first frame.
+[profile.dev.package.platform]
+opt-level = 3
+
+[profile.dev.package.platform-draw]
+opt-level = 3
+
+[profile.dev.package.grid]
+opt-level = 3
+
+[profile.dev.package.vt_parser]
+opt-level = 3
 
 [workspace.package]
 edition = "2021"
@@ -17,8 +35,18 @@ base58ck = { version = "=0.1.101", default-features = false, features = ["std"] 
 bech32 = { version = "=0.11.1", default-features = false, features = ["alloc"] }
 miniscript = { version = "=13.1.0", default-features = false, features = ["std"] }
 
+el-bip32 = { path = "crates/el-bip32" }
 el-entropy = { path = "crates/el-entropy" }
 xinachtli = { path = "/home/cuarentaydos/Code/tooling/xinachtli" }
+
+# The Wayland window, software canvas, and text renderer come from the cozy
+# workspace by path. Nothing is copied: a vendored fork would drift from the
+# crates that the cozy binaries exercise every day. Those crates are edition
+# 2024 and keep their own edition through the path dependency.
+platform = { path = "/home/cuarentaydos/Code/forfun/cozy/crates/platform" }
+statusbar = { path = "/home/cuarentaydos/Code/forfun/cozy/crates/statusbar" }
+config = { path = "/home/cuarentaydos/Code/forfun/cozy/crates/config" }
+waker = { path = "/home/cuarentaydos/Code/forfun/cozy/crates/waker" }
 
 [workspace.lints.clippy]
 pedantic = { level = "warn", priority = -1 }
