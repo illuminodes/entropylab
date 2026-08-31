@@ -9,5 +9,7 @@ publish.workspace = true
 workspace = true
 
 [dependencies]
+bip39.workspace = true
 bitcoin.workspace = true
 miniscript.workspace = true
+secp256k1.workspace = true
