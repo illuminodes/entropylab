@@ -15,6 +15,7 @@ use crate::slip132::{Slip132Error, Slip132Network};
 pub struct Account {
     script: ScriptType,
     path: DerivationPath,
+    fingerprint: String,
     xpub: Xpub,
     xpriv: Option<Xpriv>,
     receive: Descriptor,
@@ -64,6 +65,7 @@ impl Account {
         Ok(Self {
             script,
             path,
+            fingerprint,
             xpub,
             xpriv: Some(xpriv),
             receive,
@@ -107,6 +109,19 @@ impl Account {
             .map(|child| format!("{child:#}"))
             .collect();
         format!("m/{}", steps.join("/"))
+    }
+
+    /// The master key fingerprint, as the descriptor origin shows it.
+    #[must_use]
+    pub fn fingerprint(&self) -> &str {
+        &self.fingerprint
+    }
+
+    /// The SLIP-132 prefix the account public key carries, such as `zpub`.
+    #[must_use]
+    pub fn slip132_prefix(&self) -> &'static str {
+        let network = Slip132Network::from(self.xpub.network);
+        self.script.key_version(network, false).prefix()
     }
 
     #[must_use]
@@ -246,6 +261,31 @@ mod tests {
             account.slip132_xpriv().unwrap().unwrap(),
             "zprvAdG4iTXWBoARxkkzNpNh8r6Qag3irQB8PzEMkAFeTRXxHpbF9z4QgEvBRmfvqWvGp42t42nvgGpNgYSJA9iefm1yYNZKEm7z6qUWCroSQnE"
         );
+    }
+
+    /// The BIP-84 vectors publish this master fingerprint, and the receive
+    /// descriptor already carries it as the origin.
+    #[test]
+    fn the_fingerprint_matches_the_descriptor_origin() {
+        let account = Account::derive(&master(Network::Bitcoin), ScriptType::P2wpkh, 0).unwrap();
+        assert_eq!(account.fingerprint(), "73c5da0a");
+        assert!(account
+            .receive_descriptor()
+            .to_string()
+            .contains("[73c5da0a/"));
+    }
+
+    #[test]
+    fn every_script_reports_the_prefix_of_its_account_key() {
+        for script in ScriptType::ALL {
+            let account = Account::derive(&master(Network::Bitcoin), script, 0).unwrap();
+            assert!(account
+                .slip132_xpub()
+                .unwrap()
+                .starts_with(account.slip132_prefix()));
+        }
+        let taproot = Account::derive(&master(Network::Bitcoin), ScriptType::P2tr, 0).unwrap();
+        assert_eq!(taproot.slip132_prefix(), "xpub");
     }
 
     /// BIP-49 publishes its account key on testnet, in the SLIP-132 upub

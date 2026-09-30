@@ -43,6 +43,18 @@ impl ScriptType {
         }
     }
 
+    /// The short address-shape label, matching the `short` field of the web
+    /// app's script table in `src/js/app.js`.
+    #[must_use]
+    pub const fn short(self) -> &'static str {
+        match self {
+            Self::P2pkh => "Legacy 1…",
+            Self::P2shP2wpkh => "Nested 3…",
+            Self::P2wpkh => "SegWit bc1q…",
+            Self::P2tr => "Taproot bc1p…",
+        }
+    }
+
     /// Wraps a key expression in the descriptor function of this script.
     #[must_use]
     pub fn descriptor_body(self, key: &str) -> String {
@@ -117,6 +129,14 @@ mod tests {
         assert_eq!(ScriptType::P2tr.slip132_family(), Slip132Family::P2pkh);
         let version = ScriptType::P2tr.key_version(Slip132Network::Mainnet, false);
         assert_eq!(version.prefix(), "xpub");
+    }
+
+    #[test]
+    fn the_short_labels_match_the_javascript_table() {
+        assert_eq!(ScriptType::P2pkh.short(), "Legacy 1…");
+        assert_eq!(ScriptType::P2shP2wpkh.short(), "Nested 3…");
+        assert_eq!(ScriptType::P2wpkh.short(), "SegWit bc1q…");
+        assert_eq!(ScriptType::P2tr.short(), "Taproot bc1p…");
     }
 
     #[test]

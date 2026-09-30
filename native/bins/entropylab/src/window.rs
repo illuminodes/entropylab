@@ -2,29 +2,25 @@
 
 use platform::draw::{Canvas, Color, Rect};
 use platform::toplevel::{Key, KeyPress, Painter, PhysicalSize};
-use statusbar::TextRenderer;
 
-use crate::report::Report;
 use crate::theme::Theme;
+use crate::ui::fonts::Fonts;
+use crate::ui::page::Page;
 
 pub struct WalletWindow {
-    report: Report,
+    page: Page,
     theme: Theme,
-    text: TextRenderer,
+    fonts: Fonts,
     quit: bool,
     frames: u32,
 }
 
 impl WalletWindow {
-    const MARGIN: i32 = 24;
-    const LINE_HEIGHT: i32 = 22;
-    const RULE_WIDTH: i32 = 2;
-
-    pub const fn new(report: Report, theme: Theme, text: TextRenderer) -> Self {
+    pub const fn new(page: Page, theme: Theme, fonts: Fonts) -> Self {
         Self {
-            report,
+            page,
             theme,
-            text,
+            fonts,
             quit: false,
             frames: 0,
         }
@@ -52,29 +48,11 @@ impl Painter for WalletWindow {
 
     fn paint(&mut self, canvas: &mut Canvas<'_>, size: PhysicalSize) {
         self.frames += 1;
-        canvas.fill_rect(
+        self.page.paint(
+            canvas,
+            &mut self.fonts,
+            &self.theme,
             Rect::new(0, 0, size.width, size.height),
-            self.theme.background,
         );
-        canvas.fill_rect(
-            Rect::new(0, 0, Self::RULE_WIDTH, size.height),
-            self.theme.accent,
-        );
-
-        let mut y = Self::MARGIN;
-        for line in self.report.lines() {
-            if y > size.height {
-                break;
-            }
-            self.text.draw_text(
-                canvas,
-                line.text(),
-                Self::MARGIN,
-                y,
-                self.theme.for_kind(line.kind()),
-                self.theme.background,
-            );
-            y += Self::LINE_HEIGHT;
-        }
     }
 }
