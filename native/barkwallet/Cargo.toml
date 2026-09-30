@@ -1,0 +1,32 @@
+[package]
+name = "barkwallet-bin"
+edition = "2021"
+version = "0.1.0"
+license = "Unlicense"
+publish = false
+
+[[bin]]
+name = "barkwallet"
+path = "src/main.rs"
+
+# `bark-wallet`'s dependency graph pins a yanked prerelease of `secp256k1`
+# that the entropylab workspace's own fresh resolution refuses to select
+# (cargo excludes yanked crates unless one is already locked in). Giving
+# this crate its own detached workspace means it gets its own `Cargo.lock`,
+# seeded independently rather than merged into the parent's resolve graph.
+[workspace]
+
+[dependencies]
+# The window: xdg-shell toplevel, the software canvas, and key input.
+platform = { path = "/home/cuarentaydos/Code/forfun/cozy/crates/platform" }
+# `TextRenderer`, shared with the cozy binaries so text metrics agree.
+statusbar = { path = "/home/cuarentaydos/Code/forfun/cozy/crates/statusbar" }
+# The font and colour tables the cozy clients read.
+config = { path = "/home/cuarentaydos/Code/forfun/cozy/crates/config" }
+waker = { path = "/home/cuarentaydos/Code/forfun/cozy/crates/waker" }
+# The caret-aware single-line field, shared with `bins/files`.
+widget = { path = "/home/cuarentaydos/Code/forfun/cozy/crates/widget" }
+# The Ark/Lightning wallet: onboard address + pay-invoice, no UI at all.
+woof = { path = "/home/cuarentaydos/Code/authenticdoc/woof" }
+bip39 = "2"
+tokio = { version = "1", features = ["rt-multi-thread"] }
